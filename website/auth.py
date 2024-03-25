@@ -34,7 +34,6 @@ def logout():
     logout_user()
     return redirect(url_for('auth.login'))
 
-
 @auth.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'POST':
@@ -43,6 +42,7 @@ def sign_up():
         password1 = request.form.get('password1')
         password2 = request.form.get('password2')
 
+        # Checking if the user already exists
         user = User.query.filter_by(email=email).first()
         if user:
             flash('Email already exists.', category='error')
@@ -55,12 +55,13 @@ def sign_up():
         elif len(password1) < 7:
             flash('Password must be at least 7 characters.', category='error')
         else:
-            new_user = User(email=email, first_name=first_name, password=generate_password_hash(
-                password1, method='sha256'))
+            # Hashing the password and creating a new user
+            hashed_password = generate_password_hash(password1, method='pbkdf2:sha256')
+            new_user = User(email=email, first_name=first_name, password=hashed_password)
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=True)
             flash('Account created!', category='success')
             return redirect(url_for('views.home'))
 
-    return render_template("sign_up.html", user=current_user)
+    return render_template("sign_up.html")
