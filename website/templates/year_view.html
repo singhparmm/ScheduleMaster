@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Yearly View</title>
+    <style>
+                .year-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Adjust based on layout preference */
+            gap: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .month-btn {
+            font-size: 25px; /* Adjust the size as needed */
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            padding: 30px 30px;
+            border-radius: 5px;
+            display: inline-block; /* Or block if you prefer */
+            transition: background-color 0.3s;
+            margin-bottom: 40px; /* Adjust the space as needed */
+
+        }
+
+        .month-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Yearly View: {{ year }}</h1>
+    <div class="year-grid">
+        {% for month, offset in months_with_offsets %}
+            <a class="month-btn" href="{{ url_for('views.monthly_view', offset=offset) }}">{{ month }}</a>
+        {% endfor %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<style>
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr); /* 7 days for a week */
+        text-align: center;
+    }
+    .calendar-day {
+        border: 1px solid #ddd;
+        padding: 10px;
+        min-height: 100px; /* Adjust based on your needs */
+    }
+    .day-name {
+        font-weight: bold;
+    }
+</style>
+
+<style>
+    .navigation-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    .btn {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+    .btn:hover {
+        background-color: #0056b3;
+    }
+</style>
+
+<h2> Monthly View: {{ current_month }} {{ current_year }}</h2>
+<div class="navigation-buttons">
+    <a href="{{ url_for('views.monthly_view', offset=prev_month_offset) }}" class="btn">Previous Month</a>
+    <a href="{{ url_for('views.monthly_view', offset=next_month_offset) }}" class="btn">Next Month</a>
+</div>
+    
+    <div class="calendar-grid">
+        <!-- Day Names -->
+        <div class="day-name">Sunday</div>
+        <div class="day-name">Monday</div>
+        <div class="day-name">Tuesday</div>
+        <div class="day-name">Wednesday</div>
+        <div class="day-name">Thursday</div>
+        <div class="day-name">Friday</div>
+        <div class="day-name">Saturday</div>
+    
+        <!-- Dates -->
+        {% for day in days %}
+            {% if day %}
+                <!-- Use day directly as it's already a full date string -->
+                <a href="{{ url_for('views.day_detail', date=day) }}" class="calendar-day">{{ day[-2:] }}</a>
+            {% else %}
+                <div class="calendar-day empty"></div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Day Detail</title>
+    <style>
+        .time-grid {
+            display: grid;
+            grid-template-columns: 100px auto;
+            gap: 10px;
+        }
+        .time-slot, .note-entry {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Notes for {{ date }}</h1>
+    <div class="time-grid">
+        {% for hour in range(24) %}
+        <div class="time-slot">{{ '%02d:00' % hour }}</div>
+        <div class="note-entry"><!-- Notes can go here --></div>
+        {% endfor %}
+    </div>
+</body>
+</html>
