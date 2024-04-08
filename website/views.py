@@ -21,29 +21,26 @@ views = Blueprint('views', __name__)
 @login_required
 def home():
     if request.method == 'POST': 
-        note = request.form.get('note')#Gets the note from the HTML 
+        note = request.form.get('note')
 
         if len(note) < 1:
             flash('Note is too short!', category='error') 
         else:
-            new_note = Note(data=note, user_id=current_user.id)  #providing the schema for the note 
-            db.session.add(new_note) #adding the note to the database 
+            new_note = Note(data=note, user_id=current_user.id)
+            db.session.add(new_note) 
             db.session.commit()
             flash('Note added!', category='success')
 
     return render_template("home.html", user=current_user)
-
-# New view routes
 
 
 @views.route('/day-detail')
 @login_required
 def day_detail():
     date_str = request.args.get('date')
-    # Use date_str directly since it's already in the correct format
     date = datetime.strptime(date_str, '%Y-%m-%d').date()
     notes = Note.query.filter_by(date=date, user_id=current_user.id).all()
-    return render_template("day_detail.html", date=date_str, notes=notes)
+    return render_template("day_detail.html", date=date_str, notes=notes, user=current_user)
 
 
 @views.route('/weekly')
@@ -74,20 +71,16 @@ def monthly_view():
     target_month = first_day_of_current_month + relativedelta(months=offset)
     days_in_month = monthrange(target_month.year, target_month.month)[1]
 
-    # Calculate placeholders for the beginning of the month
     placeholders_before = (target_month.weekday() + 1) % 7
     days = [''] * placeholders_before
 
-    # Add actual days of the month with full date strings
     for day in range(1, days_in_month + 1):
         full_date = datetime(target_month.year, target_month.month, day).strftime('%Y-%m-%d')
-        days.append(full_date)  # Append the full date string instead of just the day
-
-    # Add placeholders to the end if necessary to complete the grid
+        days.append(full_date) 
     placeholders_after = 7 - ((len(days) % 7) or 7)
     days.extend([''] * placeholders_after)
 
-    return render_template("month_view.html", days=days, current_month=target_month.strftime("%B"), current_year=target_month.year, next_month_offset=offset + 1, prev_month_offset=offset - 1)
+    return render_template("month_view.html", days=days, current_month=target_month.strftime("%B"), current_year=target_month.year, next_month_offset=offset + 1, prev_month_offset=offset - 1, user=current_user)
 
 
 
@@ -96,7 +89,6 @@ def monthly_view():
 def yearly_view():
     today = datetime.now()
     current_year = today.year
-    # Generate a list of months with their relative offsets from the current month
     months_with_offsets = []
     for i in range(1, 13):
         month_date = datetime(current_year, i, 1)
@@ -109,7 +101,7 @@ def yearly_view():
 
 @views.route('/delete-note', methods=['POST'])
 def delete_note():  
-    note = json.loads(request.data) # this function expects a JSON from the INDEX.js file 
+    note = json.loads(request.data) 
     noteId = note['noteId']
     note = Note.query.get(noteId)
     if note:
@@ -118,3 +110,26 @@ def delete_note():
             db.session.commit()
 
     return jsonify({})
+
+@views.route('/add_note', methods=['POST'])
+def add_note():
+    date = request.json['date']
+    hour = request.json['hour']
+    content = request.json['content']
+    note_date = datetime.strptime(date, '%Y-%m-%d').date()
+    existing_note = Note.query.filter_by(date=note_date, hour=hour, user_id=current_user.id).first()
+    if existing_note:
+        existing_note.data = content
+        db.session.commit()
+        return jsonify({'message': 'Note updated successfully'})
+    else:
+        note = Note(date=note_date, hour=hour, data=content, user_id=current_user.id)
+        db.session.add(note)
+        db.session.commit()
+        return jsonify({'message': 'Note added successfully'})
+
+@views.route('/get_notes', methods=['POST'])
+def get_notes():
+    date = request.json.get('date')
+    notes = Note.query.filter_by(date=date, user_id=current_user.id).all()
+    return jsonify({'notes': [{'id': note.id, 'data': note.data} for note in notes]})

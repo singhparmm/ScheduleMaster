@@ -1,13 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Monthly View{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <style>
     .calendar-grid {
         display: grid;
-        grid-template-columns: repeat(7, 1fr); /* 7 days for a week */
+        grid-template-columns: repeat(7, 1fr); 
         text-align: center;
     }
     .calendar-day {
         border: 1px solid #ddd;
         padding: 10px;
-        min-height: 100px; /* Adjust based on your needs */
+        min-height: 100px; 
     }
     .day-name {
         font-weight: bold;
@@ -31,7 +38,9 @@
         background-color: #0056b3;
     }
 </style>
+</head>
 
+<body>
 <h2> Monthly View: {{ current_month }} {{ current_year }}</h2>
 <div class="navigation-buttons">
     <a href="{{ url_for('views.monthly_view', offset=prev_month_offset) }}" class="btn">Previous Month</a>
@@ -47,15 +56,14 @@
         <div class="day-name">Thursday</div>
         <div class="day-name">Friday</div>
         <div class="day-name">Saturday</div>
-    
-        <!-- Dates -->
         {% for day in days %}
             {% if day %}
-                <!-- Use day directly as it's already a full date string -->
                 <a href="{{ url_for('views.day_detail', date=day) }}" class="calendar-day">{{ day[-2:] }}</a>
             {% else %}
                 <div class="calendar-day empty"></div>
             {% endif %}
         {% endfor %}
     </div>
-    
+</body>
+</html>
+{% endblock %}

@@ -1,3 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Yearly View{% endblock %}
+
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,22 +10,22 @@
     <style>
                 .year-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* Adjust based on layout preference */
+            grid-template-columns: repeat(3, 1fr); 
             gap: 10px;
             padding: 10px;
             text-align: center;
         }
 
         .month-btn {
-            font-size: 25px; /* Adjust the size as needed */
+            font-size: 25px; 
             background-color: #007bff;
             color: white;
             text-decoration: none;
             padding: 30px 30px;
             border-radius: 5px;
-            display: inline-block; /* Or block if you prefer */
+            display: inline-block; 
             transition: background-color 0.3s;
-            margin-bottom: 40px; /* Adjust the space as needed */
+            margin-bottom: 40px; 
 
         }
 
@@ -39,3 +43,4 @@
     </div>
 </body>
 </html>
+{% endblock %}

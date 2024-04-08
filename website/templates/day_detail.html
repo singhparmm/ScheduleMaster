@@ -1,3 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Day View{% endblock %}
+
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,8 +24,15 @@
     <div class="time-grid">
         {% for hour in range(24) %}
         <div class="time-slot">{{ '%02d:00' % hour }}</div>
-        <div class="note-entry"><!-- Notes can go here --></div>
+        <div class="note-entry" id="note-entry-{{ hour }}">
+            {% for note in notes %}
+                {% if note.hour == hour %}
+                    <div>{{ note.data }}</div>
+                {% endif %}
+            {% endfor %}
+        </div>
         {% endfor %}
     </div>
 </body>
 </html>
+{% endblock %}
