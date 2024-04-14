@@ -23,15 +23,13 @@
         }
     </style>
 
-
-
     <meta charset="UTF-8">
     <title>Weekly View</title>
     
     <style>
         .week-grid {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(8, 1fr); /* Added 'auto' for time column */
             grid-template-rows: auto;
             text-align: center;
         }
@@ -41,7 +39,7 @@
         }
         .time-slot {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(8, 1fr); /* Updated time-slot grid */
         }
         .time-slot div {
             border: 1px solid #ddd;
@@ -61,18 +59,19 @@
         <a href="{{ url_for('views.weekly_view', offset=next_week_offset) }}" class="btn">Next Week</a>
     </div>
     <div class="week-grid header">
-        {% for day, date in dates_with_days %}
-        <div>{{ day }} {{ date }}</div>
+        <div class="time-header"></div>
+        {% for day_name, date_str in dates_with_days %}
+        <a href="{{ url_for('views.day_detail', date=date_str) }}">
+            {{ day_name }} {{ date_str }}
+        </a>
         {% endfor %}
     </div>
 
-
-
-    
     {% for hour in range(0, 24) %}
     <div class="time-slot">
-        <div>{{ hour }}:00</div> 
+        <div class="time-header">{{ hour }}:00</div>
         <div></div> 
+        <div></div>
         <div></div>
         <div></div>
         <div></div>
@@ -81,16 +80,6 @@
     </div>
     {% endfor %}
 
-    <div>
-        {% for day_name, date_str in dates_with_days %}
-        <a href="{{ url_for('views.day_detail', date=date_str) }}">
-            {{ day_name }} {{ date_str }}
-        </a>
-        {% endfor %}
-    </div>
-
-
- 
 </body>
 </html>
 {% endblock %}

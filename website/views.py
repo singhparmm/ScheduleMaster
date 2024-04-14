@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from .models import Note
 from . import db
 import json
+from sqlalchemy import func
 
 
 from datetime import datetime, timedelta
@@ -39,7 +40,7 @@ def home():
 def day_detail():
     date_str = request.args.get('date')
     date = datetime.strptime(date_str, '%Y-%m-%d').date()
-    notes = Note.query.filter_by(date=date, user_id=current_user.id).all()
+    notes = Note.query.filter(func.date(Note.date)==date, Note.user_id==current_user.id).all()
     return render_template("day_detail.html", date=date_str, notes=notes, user=current_user)
 
 
