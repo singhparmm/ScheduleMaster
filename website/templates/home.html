@@ -1,24 +1,43 @@
-{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
-  %}
-  <h1 align="center">Notes</h1>
-  <ul class="list-group list-group-flush" id="notes">
-    {% for note in user.notes %}
-    <li class="list-group-item">
-      {{ note.data }}
-      <button type="button" class="close" onClick="deleteNote({{ note.id }})">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </li>
-    {% endfor %}
-  </ul>
-  <form method="POST">
-    <textarea name="note" id="note" class="form-control"></textarea>
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<h1 align="center">Upcoming Notes</h1>
+  <div class="container mt-4">
+    {% if notes %}
+      <ul class="list-group">
+        {% for note in notes %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <h5>{{ note.date.strftime('%A, %B %d, %Y') }}</h5>
+              <h6>Time: {{ note.hour }}:00</h6>
+              <p>{{ note.data }}</p>
+            </div>
+            <button class="btn btn-danger" onclick="deleteNote({{ note.id }})">Delete</button>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No upcoming notes.</p>
+    {% endif %}
+  </div>
+  
+
+  <form id="add-note-form">
+    <textarea name="note" id="note" class="form-control" rows="4" cols="50" placeholder="Enter your note here..."></textarea>
     <br />
     <div align="center">
+      <input type="date" name="date" id="note-date">
+      <br>
+      <label for="hour">Hour:</label>
+      <select name="hour" id="hour">
+        {% for hour in range(24) %}
+        <option value="{{ hour }}">{{ '%02d:00' % hour }}</option>
+        {% endfor %}
+      </select>
+      <br>
       <button type="submit" class="btn btn-primary">Add Note</button>
     </div>
   </form>
-
 
   <div>
     <a href="{{ url_for('views.weekly_view') }}" class="btn">Weekly View</a>
@@ -26,5 +45,62 @@
     <a href="{{ url_for('views.yearly_view') }}" class="btn">Yearly View</a>
   </div>
 
-  
-  {% endblock %}
+  <script>
+
+
+// function editNote(noteId, currentData, currentDate, currentHour) {
+//     const newData = prompt("Edit your note:", currentData);
+//     const newDate = prompt("Edit the date (YYYY-MM-DD):", currentDate);
+//     const newHour = prompt("Edit the hour (0-23):", currentHour);
+//     if (newData !== null && newDate !== null && newHour !== null) {
+//         fetch('/update_note', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/x-www-form-urlencoded',
+//             },
+//             body: `note_id=${noteId}&new_content=${encodeURIComponent(newData)}&new_date=${newDate}&new_hour=${newHour}`
+//         })
+//         .then(response => response.json())
+//         .then(data => {
+//             alert(data.message);
+//             location.reload();  // Reload the page to see the updated note
+//         })
+//         .catch(error => console.error('Error updating note:', error));
+//     }
+// }
+
+
+
+
+
+
+    document.getElementById('add-note-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const date = document.getElementById('note-date').value;
+      const hour = document.getElementById('hour').value;
+      const content = document.getElementById('note').value;
+
+      const response = await fetch('/add_note', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          date: date,
+          hour: hour,
+          content: content
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert(result.message);
+      } else {
+        alert('Error adding note');
+      }
+    });
+
+
+
+  </script>
+{% endblock %}

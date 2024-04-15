@@ -1,5 +1,39 @@
 {% extends "base.html" %} {% block title %}Login{% endblock %} {% block content
   %}
+  <style>
+    body {
+      background: linear-gradient(to bottom, #333333, #222222); 
+      color: #fff; 
+    }
+    .container {
+      height: 100vh; 
+      display: flex;
+      flex-direction: column;
+    }
+
+    form {
+      margin-top: 150px; 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .form-group {
+      width: 500px; 
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .form-control {
+      justify-content: center;
+      width: 750px; 
+      align-items: center;
+    }
+    
+  </style>
+  <body>
   <form method="POST">
     <h3 align="center">Login</h3>
     <div class="form-group">
@@ -25,4 +59,5 @@
     <br />
     <button type="submit" class="btn btn-primary">Login</button>
   </form>
+  </body>
   {% endblock %}
