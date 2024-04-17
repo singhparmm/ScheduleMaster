@@ -23,11 +23,16 @@
   color: #0f3c6c;  /* Bootstrap primary blue for date */
   font-size: 16px;  /* Smaller font size for the date */
 }
+.list-group-item h4 {
+  font-size: 20px;  /* Smaller font size for the date */
+}
 
 .list-group-item h6 {
   color: #6c757d;  /* Bootstrap secondary text color for time */
   font-size: 14px;  /* Adjusted time size if needed */
 }
+
+
 
 .list-group-item p {
   font-size: 16px;  /* Consistent font size for note text */
@@ -120,14 +125,95 @@
 
 {% block javascript %}
   <script type="text/javascript">
-    function deleteNote(noteId) {
-      fetch("/delete-note", {
-        method: "POST",
-        body: JSON.stringify({ noteId: noteId }),
-      }).then((_res) => {
-        window.location.href = "/";
-      });
+
+
+function deleteNote(noteId) {
+    if (confirm("Are you sure you want to delete this note?")) {
+        fetch('/delete-note', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ noteId: noteId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(data.message); // Show success message from backend
+                location.reload(); // Reload the page to reflect the note deletion
+            } else {
+                alert(data.message); // Show error message from backend
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting note:', error);
+            alert('Failed to delete note.');
+        });
     }
+}
+
+
+function editNote(noteId, title, data) {
+    const newTitle = prompt("Edit title:", title);
+    const newData = prompt("Edit your note:", data);
+    if (newTitle !== null && newData !== null) {
+        fetch('/update_note', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `note_id=${noteId}&new_title=${encodeURIComponent(newTitle)}&new_content=${encodeURIComponent(newData)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            location.reload();  // Reload the page to see the updated note
+        })
+        .catch(error => console.error('Error updating note:', error));
+    }
+}
+
+function toggleNoteContent(noteElement) {
+    const content = noteElement.querySelector('.note-content');
+    if (content.style.display === 'block') {
+        content.style.display = 'none';
+        content.classList.remove('note-expanded');
+    } else {
+        content.style.display = 'block';
+        content.classList.add('note-expanded');
+        content.style.height = content.scrollHeight + 'px'; // This line may be unnecessary if you're not setting a specific height
+    }
+}
+
+
+
+
+
+document.getElementById('add-note-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('title').value;
+    const content = document.getElementById('note').value;
+    const date = document.getElementById('note-date').value;
+    const hour = document.getElementById('hour').value;
+
+    const response = await fetch('/add_note', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({title, date, hour, content})
+    });
+
+    if (response.ok) {
+        const result = await response.json();
+        alert(result.message);
+        location.reload();  // Reload the page to show the new note
+    } else {
+        alert('Error adding note');
+    }
+});
+
+
+
+
   </script>
 {% endblock %}
 </body>

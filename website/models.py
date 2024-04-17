@@ -5,6 +5,7 @@ from sqlalchemy.sql import func
 
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255))  # Ensure this line is correctly added
     data = db.Column(db.String(10000))
     date = db.Column(db.DateTime(timezone=True), default=func.now())
     hour = db.Column(db.Integer)

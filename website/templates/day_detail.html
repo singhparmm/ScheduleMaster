@@ -17,6 +17,39 @@
             padding: 10px;
             border: 1px solid #ccc;
         }
+
+
+        .note {
+    border: 1px solid #ddd; /* Grey border around each note */
+    padding: 10px; /* Padding inside the note */
+    margin-bottom: 10px; /* Space between notes */
+    background-color: #f0f0f0; /* White background for each note */
+    cursor: default; /* Normal cursor instead of pointer */
+}
+
+.note strong {
+    display: block; /* Ensure the title takes up the full width */
+    margin-bottom: 5px; /* Space between title and content */
+    color: #333; /* Dark text for the title */
+    cursor: pointer; /* Re-apply pointer cursor to the title only */
+}
+
+.note-content {
+    display: none; /* Start off hidden */
+    padding: 10px;
+    background-color: #f9f9f9; /* Light grey background to distinguish content */
+    border-top: 1px solid #e6e6e6; /* Separator between title and content */
+}
+
+.note-content.note-expanded {
+    display: block; /* Show when expanded */
+}
+
+.note-actions {
+    text-align: right; /* Align the buttons to the right */
+    padding-top: 10px; /* Space above the buttons */
+}
+
     </style>
 </head>
 <body>
@@ -27,12 +60,28 @@
         <div class="note-entry" id="note-entry-{{ hour }}">
             {% for note in notes %}
                 {% if note.hour == hour %}
-                    <div>{{ note.data }}</div>
+                    <div class="note">
+                        <strong onclick="toggleNoteContent(this.parentNode)">{{ note.title }}</strong>
+                        <div class="note-content">
+                            {{ note.data }}
+                            <div class="note-actions">
+                                <button type="button" onclick="editNote('{{ note.id }}', '{{ note.title }}', '{{ note.data }}')" class="btn btn-sm btn-primary">Edit</button>
+                                <button type="button" onclick="deleteNote('{{ note.id }}')" class="btn btn-sm btn-danger">Delete</button>
+                            </div>
+                        </div>
+                    </div>
                 {% endif %}
             {% endfor %}
         </div>
         {% endfor %}
     </div>
+
+    <script>
+
+
+
+
+</script>
 </body>
 </html>
 {% endblock %}

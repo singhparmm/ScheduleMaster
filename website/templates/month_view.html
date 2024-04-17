@@ -15,6 +15,7 @@
         border: 1px solid #ddd;
         padding: 10px;
         min-height: 100px; 
+        position: relative;
     }
     .day-name {
         font-weight: bold;
@@ -37,6 +38,9 @@
     .btn:hover {
         background-color: #0056b3;
     }
+
+
+    
 </style>
 </head>
 
@@ -57,12 +61,19 @@
         <div class="day-name">Friday</div>
         <div class="day-name">Saturday</div>
         {% for day in days %}
-            {% if day %}
-                <a href="{{ url_for('views.day_detail', date=day) }}" class="calendar-day">{{ day[-2:] }}</a>
-            {% else %}
-                <div class="calendar-day empty"></div>
-            {% endif %}
-        {% endfor %}
+    {% if day %}
+        <div class="calendar-day">
+            <a href="{{ url_for('views.day_detail', date=day) }}">
+                {{ day[-2:] }}
+                <span class="note-count">
+                    Number of notes: {{ note_counts[day] if day in note_counts else 'No notes' }}
+                </span>
+            </a>
+        </div>
+    {% else %}
+        <div class="calendar-day empty"></div>
+    {% endif %}
+{% endfor %}
     </div>
 </body>
 </html>

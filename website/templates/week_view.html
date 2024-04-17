@@ -4,85 +4,160 @@
 {% block content %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <style>
-        .navigation-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .btn {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-        .btn:hover {
-            background-color: #0056b3;
-        }
-        .week-grid {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr); /* One for each day of the week plus time column */
-            grid-template-rows: auto;
-            text-align: center;
-        }
-        .week-grid div {
-            border: 1px solid #ddd;
-            padding: 10px;
-        }
-        .time-slot {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-        }
-        .time-slot div {
-            border: 1px solid #ddd;
-            padding: 5px;
-            height: 60px; 
-        }
-        .header {
-            background-color: #f3f3f3;
-            font-weight: bold;
-        }
-        .note {
-            background-color: #e9ecef;
-            border-radius: 5px;
-            padding: 5px;
-            margin: 2px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Weekly View</h1>
-    <div class="navigation-buttons">
-        <a href="{{ url_for('views.weekly_view', offset=prev_week_offset) }}" class="btn">Previous Week</a>
-        <a href="{{ url_for('views.weekly_view', offset=next_week_offset) }}" class="btn">Next Week</a>
-    </div>
-    <div class="week-grid header">
-        <div class="time-header">Time</div>
-        {% for day_name, date_str in dates_with_days %}
-        <div>
-            <strong>{{ day_name }}</strong><br>{{ date_str }}
-        </div>
-        {% endfor %}
-    </div>
+    <head>
+        <style>
+            .navigation-buttons {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 20px;
+            }
+            .btn {
+                padding: 10px 20px;
+                background-color: #007bff;
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+            }
+            .btn:hover {
+                background-color: #0056b3;
+            }
+            .week-grid {
+                display: grid;
+                grid-template-columns: 100px repeat(7, 1fr);
+                grid-template-rows: auto;
+                text-align: center;
+                width: 100%;
+            }
+            .day-header {
+                background-color: #f3f3f3;
+                font-weight: bold;
+                padding: 10px;
+                border: 1px solid #ddd;
+            }
+            .time-slot {
+                min-height: 60px;
+                border: 1px solid #ddd;
+                padding: 10px;
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+                max-height: 200px; /* Increased max-height */
+            }
+            .note {
+                cursor: pointer;
+                padding: 5px;
+                background-color: #f9f9f9;
+                border: 1px solid #ddd;
+                margin-bottom: 5px;
+            }
+            .note:hover {
+                background-color: #e6e6e6; /* Visual feedback on hover */
+            }
 
-    {% for hour in range(0, 24) %}
-    <div class="time-slot">
-        <div class="time-header">{{ hour }}:00</div>
-        {% for day_name, date_str in dates_with_days %}
-            <div>
-                {% for note in notes %}
-                    {% if note.date.strftime('%Y-%m-%d') == date_str and note.hour == hour %}
-                        <div class="note">
-                            {{ note.data }}
-                        </div>
-                    {% endif %}
-                {% endfor %}
+.note-content {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between; /* Aligns content to top, buttons to bottom */
+    padding: 10px;
+    border-top: 1px solid #ccc;
+    background-color: #f9f9f9;
+    position: relative;
+    overflow: hidden; /* Prevents content from overflowing */
+}
+
+.note-actions {
+    position: static; /* Removes absolute positioning */
+    align-self: flex-end; /* Aligns buttons to the right */
+    margin-top: auto; /* Pushes buttons to the bottom */
+}
+.note-text {
+    margin-bottom: 20px; /* Space between text and buttons */
+    /* Additional styles as needed for text content */
+}
+
+.btn-sm { /* Smaller button adjustments */
+    padding: 3px 6px; /* Smaller padding for less intrusive buttons */
+    font-size: 0.75em; /* Smaller font size for aesthetic fitting */
+}
+
+.note-expanded { /* Expanded note adjustments */
+    padding: 15px;
+    background-color: #e6e6e6; /* Lighter background when expanded */
+}
+
+
+
+        </style>
+    </head>
+    <body>
+        <h1>Weekly View</h1>
+        <div class="navigation-buttons">
+            <a href="{{ url_for('views.weekly_view', offset=prev_week_offset) }}" class="btn">Previous Week</a>
+            <a href="{{ url_for('views.weekly_view', offset=next_week_offset) }}" class="btn">Next Week</a>
+        </div>
+        
+        <div class="week-grid">
+            <!-- Empty corner cell -->
+            <div class="day-header"></div>
+            <!-- Day headers with links -->
+            {% for day_name, date_str in dates_with_days %}
+            <div class="day-header">
+                <a href="{{ url_for('views.day_detail', date=date_str) }}">
+                    {{ day_name }} <br> {{ date_str }}
+                </a>
             </div>
-        {% endfor %}
-    </div>
-    {% endfor %}
-</body>
-</html>
-{% endblock %}
+            {% endfor %}
+        </div>
+           
+
+
+        <div class="week-grid">
+            {% for hour in range(24) %}
+                <!-- Time label for each hour -->
+                <div class="time-header">{{ hour }}:00</div>
+                <!-- Day slots for each hour -->
+                {% for _, date_str in dates_with_days %}
+                    <div class="time-slot">
+                        {% for note in notes %}
+                            {% if note.date.strftime('%Y-%m-%d') == date_str and note.hour == hour %}
+                            <div class="note">
+                                <strong onclick="toggleNoteContent(this.parentNode)">{{ note.title }}</strong>
+                                <div class="note-content">
+                                <div class="note-text">
+                                    {{ note.data }}
+                                </div>
+                                <div class="note-actions">
+                                    <button type="button" onclick="editNote('{{ note.id }}', '{{ note.title }}', '{{ note.data }}')" class="btn btn-sm btn-primary">Edit</button>
+                                    <button type="button" onclick="deleteNote('{{ note.id }}')" class="btn btn-sm btn-danger">Delete</button>
+                                </div>
+                            </div>
+                    </div>
+       
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+    
+        <script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </script>
+    </body>
+    </html>
+    {% endblock %}

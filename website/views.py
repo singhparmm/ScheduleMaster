@@ -103,7 +103,20 @@ def monthly_view():
     placeholders_after = 7 - ((len(days) % 7) or 7)
     days.extend([''] * placeholders_after)
 
-    return render_template("month_view.html", days=days, current_month=target_month.strftime("%B"), current_year=target_month.year, next_month_offset=offset + 1, prev_month_offset=offset - 1, user=current_user)
+    note_counts = {}
+    for day in range(1, days_in_month + 1):
+        day_date = datetime(target_month.year, target_month.month, day)
+        count = Note.query.filter_by(user_id=current_user.id, date=day_date).count()
+        note_counts[day_date.strftime('%Y-%m-%d')] = count
+
+    return render_template("month_view.html", 
+                           days=days, 
+                           note_counts=note_counts, 
+                           current_month=target_month.strftime("%B"), 
+                           current_year=target_month.year, 
+                           next_month_offset=offset + 1, 
+                           prev_month_offset=offset - 1, 
+                           user=current_user)
 
 
 
@@ -123,33 +136,49 @@ def yearly_view():
 
 
 @views.route('/delete-note', methods=['POST'])
-def delete_note():  
-    note = json.loads(request.data) 
-    noteId = note['noteId']
-    note = Note.query.get(noteId)
-    if note:
-        if note.user_id == current_user.id:
-            db.session.delete(note)
-            db.session.commit()
+@login_required
+def delete_note():
+    data = request.get_json()  # Make sure to extract data from JSON payload
+    note_id = data['noteId']
+    note = Note.query.get(note_id)
 
-    return jsonify({})
+    if not note:
+        return jsonify({'status': 'error', 'message': 'Note not found.'}), 404
+
+    if note.user_id != current_user.id:
+        return jsonify({'status': 'error', 'message': 'Unauthorized'}), 403
+
+    try:
+        db.session.delete(note)
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': 'Note deleted successfully.'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': 'Failed to delete note.'}), 500
+
+
+
 
 @views.route('/add_note', methods=['POST'])
 def add_note():
-    date = request.json['date']
-    hour = request.json['hour']
-    content = request.json['content']
-    note_date = datetime.strptime(date, '%Y-%m-%d').date()
-    existing_note = Note.query.filter_by(date=note_date, hour=hour, user_id=current_user.id).first()
-    if existing_note:
-        existing_note.data = content
-        db.session.commit()
-        return jsonify({'message': 'Note updated successfully'})
-    else:
-        note = Note(date=note_date, hour=hour, data=content, user_id=current_user.id)
-        db.session.add(note)
+    data = request.get_json()
+    title = data['title']
+    content = data['content']
+    date = data['date']
+    hour = data['hour']
+
+    try:
+        note_date = datetime.strptime(date, '%Y-%m-%d').date()
+        new_note = Note(title=title, data=content, date=note_date, hour=int(hour), user_id=current_user.id)
+        db.session.add(new_note)
         db.session.commit()
         return jsonify({'message': 'Note added successfully'})
+    except Exception as e:
+        return jsonify({'message': 'Error adding note: ' + str(e)}), 400
+    
+    
+
+
 
 @views.route('/get_notes', methods=['POST'])
 def get_notes():
@@ -159,22 +188,20 @@ def get_notes():
 
 
 
-# @app.route('/update_note', methods=['POST'])
-# @login_required
-# def update_note():
-#     note_id = request.form.get('note_id')
-#     new_content = request.form.get('new_content')
-#     new_date = request.form.get('new_date')
-#     new_hour = request.form.get('new_hour')
-#     note = Note.query.get(note_id)
+@views.route('/update_note', methods=['POST'])
+@login_required
+def update_note():
+    note_id = request.form.get('note_id')
+    new_title = request.form.get('new_title')
+    new_content = request.form.get('new_content')
+    note = Note.query.get(note_id)
     
-#     if note and note.user_id == current_user.id:
-#         note.data = new_content
-#         note.date = datetime.strptime(new_date, '%Y-%m-%d')
-#         note.hour = int(new_hour)
-#         db.session.commit()
-#         flash('Note updated successfully!', category='success')
-#         return redirect(url_for('home'))
-#     else:
-#         flash('Error updating note.', category='error')
-#         return redirect(url_for('home'))
+    if note and note.user_id == current_user.id:
+        note.title = new_title
+        note.data = new_content
+        db.session.commit()
+        flash('Note updated successfully!', category='success')
+        return jsonify({'message': 'Note updated successfully!'}), 200
+    else:
+        flash('Error updating note.', category='error')
+        return jsonify({'message': 'Error updating note.'}), 400
