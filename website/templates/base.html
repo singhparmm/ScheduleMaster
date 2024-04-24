@@ -78,6 +78,26 @@
     <div class="collapse navbar-collapse" id="navbar">
       <div class="navbar-nav">
         {% if user.is_authenticated %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            View
+          </a>
+          <div class="dropdown-menu" aria-labelledby="viewDropdown">
+            <a class="dropdown-item" href="{{ url_for('views.weekly_view') }}">Weekly View</a>
+            <a class="dropdown-item" href="{{ url_for('views.monthly_view') }}">Monthly View</a>
+            <a class="dropdown-item" href="{{ url_for('views.yearly_view') }}">Yearly View</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="colorDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Background Color
+          </a>
+          <div class="dropdown-menu" aria-labelledby="colorDropdown">
+            <a class="dropdown-item" href="#" onclick="changeBackgroundColor('white')">White</a>
+            <a class="dropdown-item" href="#" onclick="changeBackgroundColor('lightgray')">Light Gray</a>
+            <a class="dropdown-item" href="#" onclick="changeBackgroundColor('lightblue')">Light Blue</a>
+          </div>
+        </li>
         <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
         {% else %}
         <a class="nav-item nav-link" id="login" href="/login">Login</a>
@@ -186,7 +206,17 @@ function toggleNoteContent(noteElement) {
 }
 
 
+function changeBackgroundColor(color) {
+    document.body.style.backgroundColor = color;
+    localStorage.setItem('backgroundColor', color);
+}
 
+window.onload = function() {
+    var savedColor = localStorage.getItem('backgroundColor');
+    if (savedColor) {
+      document.body.style.backgroundColor = savedColor;
+    }
+  };
 
 
 document.getElementById('add-note-form').addEventListener('submit', async (e) => {
@@ -195,11 +225,13 @@ document.getElementById('add-note-form').addEventListener('submit', async (e) =>
     const content = document.getElementById('note').value;
     const date = document.getElementById('note-date').value;
     const hour = document.getElementById('hour').value;
+    const repeatFrequency = document.getElementById('repeat-frequency').value;
+    const repeatDuration = document.getElementById('repeat-duration').value;
 
     const response = await fetch('/add_note', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({title, date, hour, content})
+        body: JSON.stringify({title, date, hour, content, repeat_frequency: repeatFrequency, repeat_duration: repeatDuration})
     });
 
     if (response.ok) {

@@ -40,23 +40,18 @@
             {% endfor %}
         </select>
         <br>
+        <label for="repeat-frequency">Repeat:</label>
+        <select name="repeat-frequency" id="repeat-frequency">
+            <option value="none">None</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+        </select>
+        <label for="repeat-duration">Repeat Until:</label>
+        <input type="date" name="repeat-duration" id="repeat-duration">
         <button type="submit" class="btn btn-primary">Add Note</button>
     </div>
 </form>
 
-  <div>
-    <a href="{{ url_for('views.weekly_view') }}" class="btn">Weekly View</a>
-    <a href="{{ url_for('views.monthly_view') }}" class="btn">Monthly View</a>
-    <a href="{{ url_for('views.yearly_view') }}" class="btn">Yearly View</a>
-  </div>
-
-  <script>
-
-
-
-
-
-
-
-  </script>
 {% endblock %}

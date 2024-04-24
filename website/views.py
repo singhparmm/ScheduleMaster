@@ -166,12 +166,33 @@ def add_note():
     content = data['content']
     date = data['date']
     hour = data['hour']
+    repeat_frequency = data.get('repeat_frequency')  
+    repeat_duration = data.get('repeat_duration') 
 
     try:
         note_date = datetime.strptime(date, '%Y-%m-%d').date()
         new_note = Note(title=title, data=content, date=note_date, hour=int(hour), user_id=current_user.id)
         db.session.add(new_note)
         db.session.commit()
+
+        if repeat_frequency and repeat_duration:
+            if repeat_frequency == 'daily':
+                repeat_interval = timedelta(days=1)
+            elif repeat_frequency == 'weekly':
+                repeat_interval = timedelta(weeks=1)
+            elif repeat_frequency == 'monthly':
+                repeat_interval = relativedelta(months=1)
+            elif repeat_frequency == 'yearly':
+                repeat_interval = relativedelta(years=1)
+
+            repeat_end_date = datetime.strptime(repeat_duration, '%Y-%m-%d').date()
+            current_date = note_date
+            while current_date < repeat_end_date:
+                current_date += repeat_interval
+                new_note = Note(title=title, data=content, date=current_date, hour=int(hour), user_id=current_user.id)
+                db.session.add(new_note)
+            db.session.commit()
+            
         return jsonify({'message': 'Note added successfully'})
     except Exception as e:
         return jsonify({'message': 'Error adding note: ' + str(e)}), 400
