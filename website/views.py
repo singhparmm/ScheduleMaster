@@ -17,10 +17,57 @@ from dateutil.relativedelta import relativedelta
 from flask import render_template
 from flask import Flask, request, jsonify, flash, redirect, url_for
 
+from datetime import date
 
 
 
 views = Blueprint('views', __name__)
+
+
+# def get_holidays_by_country(country_code, year):
+#     # Create a holiday list based on the country and year
+#     holiday_list = holidays.CountryHoliday(country_code, years=year)
+#     return [{'title': name, 'date': day} for day, name in holiday_list.items()]
+
+
+
+
+# @views.route('/update_holidays')
+# @login_required
+# def update_holidays():
+#     year = datetime.now().year
+#     country_code = 'US'  # Adjust based on your location
+#     holiday_list = holidays.CountryHoliday(country_code, years=year)
+
+#     added_count = 0
+#     existing_count = 0
+#     for date, name in holiday_list.items():
+#         holiday_date = datetime.strptime(date.strftime('%Y-%m-%d'), '%Y-%m-%d')
+#         if not Note.query.filter_by(user_id=current_user.id, title=name, date=holiday_date).first():
+#             new_note = Note(title=name, date=holiday_date, hour=0, data='', user_id=current_user.id)
+#             db.session.add(new_note)
+#             added_count += 1
+#         else:
+#             existing_count += 1
+#     db.session.commit()
+#     flash(f'Added {added_count} new holidays. {existing_count} already existed.', 'info')
+#     return redirect(url_for('views.home'))
+
+
+
+
+
+
+# @views.route('/toggle_holidays')
+# @login_required
+# def toggle_holidays():
+#     current_user.show_holidays = not current_user.show_holidays
+#     db.session.commit()
+#     flash(f'Holiday visibility set to: {current_user.show_holidays}', 'info')
+#     return redirect(url_for('views.home'))
+
+
+
 
 
 @views.route('/', methods=['GET', 'POST'])
@@ -44,10 +91,19 @@ def home():
                 flash('Invalid date or time format', category='error')
                 print(e)  # For debugging
 
-    # Adjust query to include notes for today, even if past current time
     now = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    notes = Note.query.filter(Note.user_id == current_user.id, Note.date >= now).order_by(Note.date.asc()).all()
+    notes_query = Note.query.filter(Note.user_id == current_user.id, Note.date >= now)
+
+    if not current_user.show_holidays:
+        # Exclude holidays by ensuring 'data' is not empty
+        notes_query = notes_query.filter(Note.data != '')
+
+    notes = notes_query.order_by(Note.date.asc()).all()
+    flash(f'Showing {len(notes)} notes, holidays visible: {current_user.show_holidays}', 'info')
     return render_template("home.html", user=current_user, notes=notes)
+
+
+
 
 
 
@@ -57,8 +113,10 @@ def home():
 def day_detail():
     date_str = request.args.get('date')
     date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    current_hour = datetime.now().hour  # Get the current hour
+
     notes = Note.query.filter(func.date(Note.date)==date, Note.user_id==current_user.id).all()
-    return render_template("day_detail.html", date=date_str, notes=notes, user=current_user)
+    return render_template("day_detail.html", date=date_str, notes=notes, user=current_user, current_hour=current_hour)
 
 
 @views.route('/weekly')
@@ -82,7 +140,12 @@ def weekly_view():
     next_week_offset = offset + 1
     prev_week_offset = offset - 1
     
-    return render_template("week_view.html", user=current_user, dates_with_days=dates_with_days, notes=notes, next_week_offset=next_week_offset, prev_week_offset=prev_week_offset)
+    
+    return render_template("week_view.html", user=current_user, dates_with_days=dates_with_days, 
+                       notes=notes, next_week_offset=next_week_offset, prev_week_offset=prev_week_offset,
+                       today_str=today.strftime("%Y-%m-%d"))
+
+
 
 
 @views.route('/monthly')
@@ -109,14 +172,12 @@ def monthly_view():
         count = Note.query.filter_by(user_id=current_user.id, date=day_date).count()
         note_counts[day_date.strftime('%Y-%m-%d')] = count
 
-    return render_template("month_view.html", 
-                           days=days, 
-                           note_counts=note_counts, 
-                           current_month=target_month.strftime("%B"), 
-                           current_year=target_month.year, 
-                           next_month_offset=offset + 1, 
-                           prev_month_offset=offset - 1, 
-                           user=current_user)
+
+    today_str = datetime.today().strftime('%Y-%m-%d')
+    return render_template("month_view.html", days=days, note_counts=note_counts,
+                       current_month=target_month.strftime("%B"), current_year=target_month.year,
+                       next_month_offset=offset + 1, prev_month_offset=offset - 1,
+                       user=current_user, today_str=today_str)
 
 
 
@@ -138,7 +199,7 @@ def yearly_view():
 @views.route('/delete-note', methods=['POST'])
 @login_required
 def delete_note():
-    data = request.get_json()  # Make sure to extract data from JSON payload
+    data = request.get_json()  # extract data from JSON payload
     note_id = data['noteId']
     note = Note.query.get(note_id)
 
@@ -166,12 +227,33 @@ def add_note():
     content = data['content']
     date = data['date']
     hour = data['hour']
+    repeat_frequency = data.get('repeat_frequency')  
+    repeat_duration = data.get('repeat_duration') 
 
     try:
         note_date = datetime.strptime(date, '%Y-%m-%d').date()
         new_note = Note(title=title, data=content, date=note_date, hour=int(hour), user_id=current_user.id)
         db.session.add(new_note)
         db.session.commit()
+
+        if repeat_frequency and repeat_duration:
+            if repeat_frequency == 'daily':
+                repeat_interval = timedelta(days=1)
+            elif repeat_frequency == 'weekly':
+                repeat_interval = timedelta(weeks=1)
+            elif repeat_frequency == 'monthly':
+                repeat_interval = relativedelta(months=1)
+            elif repeat_frequency == 'yearly':
+                repeat_interval = relativedelta(years=1)
+
+            repeat_end_date = datetime.strptime(repeat_duration, '%Y-%m-%d').date()
+            current_date = note_date
+            while current_date < repeat_end_date:
+                current_date += repeat_interval
+                new_note = Note(title=title, data=content, date=current_date, hour=int(hour), user_id=current_user.id)
+                db.session.add(new_note)
+            db.session.commit()
+            
         return jsonify({'message': 'Note added successfully'})
     except Exception as e:
         return jsonify({'message': 'Error adding note: ' + str(e)}), 400

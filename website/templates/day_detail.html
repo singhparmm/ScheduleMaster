@@ -7,81 +7,89 @@
 <head>
     <meta charset="UTF-8">
     <title>Day Detail</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         .time-grid {
             display: grid;
-            grid-template-columns: 100px auto;
+            grid-template-columns: 100px 1fr;
             gap: 10px;
+            margin: 20px;
+            margin-bottom: 200px; /* Increased bottom margin */
+
         }
         .time-slot, .note-entry {
             padding: 10px;
             border: 1px solid #ccc;
+            border-radius: 5px; /* Rounded borders */
+            background: #f9f9f9; /* Subtle background color */
         }
-
-
         .note {
-    border: 1px solid #ddd; /* Grey border around each note */
-    padding: 10px; /* Padding inside the note */
-    margin-bottom: 10px; /* Space between notes */
-    background-color: #f0f0f0; /* White background for each note */
-    cursor: default; /* Normal cursor instead of pointer */
-}
-
-.note strong {
-    display: block; /* Ensure the title takes up the full width */
-    margin-bottom: 5px; /* Space between title and content */
-    color: #333; /* Dark text for the title */
-    cursor: pointer; /* Re-apply pointer cursor to the title only */
-}
-
-.note-content {
-    display: none; /* Start off hidden */
-    padding: 10px;
-    background-color: #f9f9f9; /* Light grey background to distinguish content */
-    border-top: 1px solid #e6e6e6; /* Separator between title and content */
-}
-
-.note-content.note-expanded {
-    display: block; /* Show when expanded */
-}
-
-.note-actions {
-    text-align: right; /* Align the buttons to the right */
-    padding-top: 10px; /* Space above the buttons */
-}
-
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #ffffff; /* Brighter white background */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Soft shadow for depth */
+            transition: transform 0.3s, box-shadow 0.3s; /* Smooth transitions for hover effects */
+        }
+        .note:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .note strong {
+            display: block;
+            margin-bottom: 5px;
+            cursor: pointer;
+            color: #333; /* Darker text for better readability */
+        }
+        .note-content {
+            display: none;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-top: 1px solid #e6e6e6;
+        }
+        .note-expanded {
+            display: block;
+        }
+        .note-actions {
+            text-align: right;
+            padding-top: 10px;
+        }
+        h1 {
+            padding-top: 50px; /* Added padding above the title */
+            text-align: center;
+        }
+        .current-hour {
+            background-color: #c8e6c9; 
+            border-left: 4px solid #43a047; 
+        }
     </style>
 </head>
 <body>
     <h1>Notes for {{ date }}</h1>
     <div class="time-grid">
         {% for hour in range(24) %}
-        <div class="time-slot">{{ '%02d:00' % hour }}</div>
-        <div class="note-entry" id="note-entry-{{ hour }}">
-            {% for note in notes %}
-                {% if note.hour == hour %}
-                    <div class="note">
-                        <strong onclick="toggleNoteContent(this.parentNode)">{{ note.title }}</strong>
-                        <div class="note-content">
-                            {{ note.data }}
-                            <div class="note-actions">
-                                <button type="button" onclick="editNote('{{ note.id }}', '{{ note.title }}', '{{ note.data }}')" class="btn btn-sm btn-primary">Edit</button>
-                                <button type="button" onclick="deleteNote('{{ note.id }}')" class="btn btn-sm btn-danger">Delete</button>
+            <div class="time-slot {% if hour == current_hour %}current-hour{% endif %}">
+                {{ '%02d:00' % hour }}
+            </div>
+            <div class="note-entry {% if hour == current_hour %}current-hour{% endif %}" id="note-entry-{{ hour }}">
+                {% for note in notes %}
+                    {% if note.hour == hour %}
+                        <div class="note">
+                            <strong onclick="toggleNoteContent(this.parentNode)">{{ note.title }}</strong>
+                            <div class="note-content">
+                                {{ note.data }}
+                                <div class="note-actions">
+                                    <button onclick="editNote('{{ note.id }}', '{{ note.title }}', '{{ note.data }}')" class="button small primary">Edit</button>
+                                    <button onclick="deleteNote('{{ note.id }}')" class="button small error">Delete</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                {% endif %}
-            {% endfor %}
-        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
         {% endfor %}
     </div>
-
-    <script>
-
-
-
-
-</script>
 </body>
 </html>
 {% endblock %}

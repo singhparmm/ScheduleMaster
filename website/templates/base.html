@@ -32,16 +32,16 @@
   font-size: 14px;  /* Adjusted time size if needed */
 }
 
-
+/* test test  */
 
 .list-group-item p {
   font-size: 16px;  /* Consistent font size for note text */
 }
 
-    .navbar {
+.navbar {
       background-color: rgba(0, 0, 0, 0.8) !important; 
       color: #fff; 
-    }
+}
 
     .navbar-nav .nav-item {
       margin-right: 10px;
@@ -60,6 +60,8 @@
     .container {
       text-align: center;
     }
+
+    
   </style>
 </head>
 <body>
@@ -78,8 +80,31 @@
     <div class="collapse navbar-collapse" id="navbar">
       <div class="navbar-nav">
         {% if user.is_authenticated %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            View
+          </a>
+          <div class="dropdown-menu" aria-labelledby="viewDropdown">
+            <a class="dropdown-item" href="{{ url_for('views.weekly_view') }}">Weekly View</a>
+            <a class="dropdown-item" href="{{ url_for('views.monthly_view') }}">Monthly View</a>
+            <a class="dropdown-item" href="{{ url_for('views.yearly_view') }}">Yearly View</a>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="colorDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Background Color
+          </a>
+          <div class="dropdown-menu" aria-labelledby="colorDropdown">
+            <a class="dropdown-item" href="#" onclick="changeBackgroundColor('white')">White</a>
+            <a class="dropdown-item" href="#" onclick="changeBackgroundColor('lightgray')">Light Gray</a>
+            <a class="dropdown-item" href="#" onclick="changeBackgroundColor('lightblue')">Light Blue</a>
+          </div>
+        </li>
         <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
+        
         {% else %}
+
+
         <a class="nav-item nav-link" id="login" href="/login">Login</a>
         <a class="nav-item nav-link" id="signUp" href="/sign-up">Sign Up</a>
         {% endif %}
@@ -127,6 +152,10 @@
   <script type="text/javascript">
 
 
+
+
+
+
 function deleteNote(noteId) {
     if (confirm("Are you sure you want to delete this note?")) {
         fetch('/delete-note', {
@@ -139,10 +168,10 @@ function deleteNote(noteId) {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                alert(data.message); // Show success message from backend
-                location.reload(); // Reload the page to reflect the note deletion
+                alert(data.message); //  success message from backend
+                location.reload(); // Reload the page
             } else {
-                alert(data.message); // Show error message from backend
+                alert(data.message); //  error message from backend
             }
         })
         .catch(error => {
@@ -181,10 +210,22 @@ function toggleNoteContent(noteElement) {
     } else {
         content.style.display = 'block';
         content.classList.add('note-expanded');
-        content.style.height = content.scrollHeight + 'px'; // This line may be unnecessary if you're not setting a specific height
+        content.style.height = content.scrollHeight + 'px';
     }
 }
 
+
+function changeBackgroundColor(color) {
+    document.body.style.backgroundColor = color;
+    localStorage.setItem('backgroundColor', color);
+}
+
+window.onload = function() {
+    var savedColor = localStorage.getItem('backgroundColor');
+    if (savedColor) {
+      document.body.style.backgroundColor = savedColor;
+    }
+};
 
 
 
