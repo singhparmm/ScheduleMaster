@@ -5,54 +5,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<style>
-    .calendar-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr); 
-        text-align: center;
-    }
-    .calendar-day {
-        border: 1px solid #ddd;
-        padding: 10px;
-        min-height: 100px; 
-        position: relative;
-    }
-    .day-name {
-        font-weight: bold;
-    }
-</style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            padding-bottom: 200px;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-gap: 10px;
+            text-align: center;
+            background-color: white;
+            border-radius: 10px;
+        }
+        .calendar-day {
+            border: 1px solid #ddd;
+            padding: 15px;
+            min-height: 150px;
+            position: relative;
+            background-color: #ffffff;
+            border-radius: 5px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .calendar-day:hover {
+            background-color: #f0f0f0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .day-name {
+            font-weight: bold;
+            padding: 10px;
+        }
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .note-count {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        .empty {
+            background-color: #eaeaea; 
+        }
 
-<style>
-    .navigation-buttons {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 20px;
-    }
-    .btn {
-        padding: 10px 20px;
-        background-color: #007bff;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-    }
-    .btn:hover {
-        background-color: #0056b3;
-    }
+        h1 {
+            padding-top: 50px; 
+            text-align: center;
+        }
+        .current-day {
+            background-color: #c8e6c9; 
+            border-color: #43a047; 
+        }
 
-
-    
-</style>
+    </style>
 </head>
-
 <body>
-<h2> Monthly View: {{ current_month }} {{ current_year }}</h2>
-<div class="navigation-buttons">
-    <a href="{{ url_for('views.monthly_view', offset=prev_month_offset) }}" class="btn">Previous Month</a>
-    <a href="{{ url_for('views.monthly_view', offset=next_month_offset) }}" class="btn">Next Month</a>
-</div>
-    
+    <h1>Monthly View: {{ current_month }} {{ current_year }}</h1>
+    <div class="navigation-buttons">
+        <a href="{{ url_for('views.monthly_view', offset=prev_month_offset) }}" class="button primary large">Previous Month</a>
+        <a href="{{ url_for('views.monthly_view', offset=next_month_offset) }}" class="button primary large">Next Month</a>
+    </div>
     <div class="calendar-grid">
-        <!-- Day Names -->
         <div class="day-name">Sunday</div>
         <div class="day-name">Monday</div>
         <div class="day-name">Tuesday</div>
@@ -62,12 +88,9 @@
         <div class="day-name">Saturday</div>
         {% for day in days %}
     {% if day %}
-        <div class="calendar-day">
+        <div class="calendar-day {{ 'current-day' if day == today_str else '' }}">
             <a href="{{ url_for('views.day_detail', date=day) }}">
-                {{ day[-2:] }}
-                <span class="note-count">
-                    Number of notes: {{ note_counts[day] if day in note_counts else 'No notes' }}
-                </span>
+                {{ day[-2:] }}<span class="note-count">Notes: {{ note_counts[day] if day in note_counts else 'None' }}</span>
             </a>
         </div>
     {% else %}

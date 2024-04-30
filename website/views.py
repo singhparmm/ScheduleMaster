@@ -57,8 +57,9 @@ def home():
 def day_detail():
     date_str = request.args.get('date')
     date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    current_hour = datetime.now().hour  
     notes = Note.query.filter(func.date(Note.date)==date, Note.user_id==current_user.id).all()
-    return render_template("day_detail.html", date=date_str, notes=notes, user=current_user)
+    return render_template("day_detail.html", date=date_str, notes=notes, user=current_user, current_hour=current_hour)
 
 
 @views.route('/weekly')
@@ -82,7 +83,9 @@ def weekly_view():
     next_week_offset = offset + 1
     prev_week_offset = offset - 1
     
-    return render_template("week_view.html", user=current_user, dates_with_days=dates_with_days, notes=notes, next_week_offset=next_week_offset, prev_week_offset=prev_week_offset)
+    return render_template("week_view.html", user=current_user, dates_with_days=dates_with_days, 
+                       notes=notes, next_week_offset=next_week_offset, prev_week_offset=prev_week_offset,
+                       today_str=today.strftime("%Y-%m-%d"))
 
 
 @views.route('/monthly')
@@ -109,14 +112,11 @@ def monthly_view():
         count = Note.query.filter_by(user_id=current_user.id, date=day_date).count()
         note_counts[day_date.strftime('%Y-%m-%d')] = count
 
-    return render_template("month_view.html", 
-                           days=days, 
-                           note_counts=note_counts, 
-                           current_month=target_month.strftime("%B"), 
-                           current_year=target_month.year, 
-                           next_month_offset=offset + 1, 
-                           prev_month_offset=offset - 1, 
-                           user=current_user)
+    today_str = datetime.today().strftime('%Y-%m-%d')
+    return render_template("month_view.html", days=days, note_counts=note_counts,
+                       current_month=target_month.strftime("%B"), current_year=target_month.year,
+                       next_month_offset=offset + 1, prev_month_offset=offset - 1,
+                       user=current_user, today_str=today_str)
 
 
 
@@ -138,7 +138,7 @@ def yearly_view():
 @views.route('/delete-note', methods=['POST'])
 @login_required
 def delete_note():
-    data = request.get_json()  # Make sure to extract data from JSON payload
+    data = request.get_json()  
     note_id = data['noteId']
     note = Note.query.get(note_id)
 
@@ -192,7 +192,7 @@ def add_note():
                 new_note = Note(title=title, data=content, date=current_date, hour=int(hour), user_id=current_user.id)
                 db.session.add(new_note)
             db.session.commit()
-            
+
         return jsonify({'message': 'Note added successfully'})
     except Exception as e:
         return jsonify({'message': 'Error adding note: ' + str(e)}), 400

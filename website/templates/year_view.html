@@ -7,30 +7,37 @@
 <head>
     <meta charset="UTF-8">
     <title>Yearly View</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-                .year-grid {
+        body {
+            padding-bottom: 300px;
+        }
+        .year-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 10px;
-            padding: 10px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
             text-align: center;
         }
-
         .month-btn {
-            font-size: 25px; 
+            font-size: 20px; 
             background-color: #007bff;
             color: white;
             text-decoration: none;
-            padding: 30px 30px;
-            border-radius: 5px;
-            display: inline-block; 
-            transition: background-color 0.3s;
-            margin-bottom: 40px; 
-
+            padding: 20px; 
+            border-radius: 8px; 
+            display: inline-block;
+            transition: transform 0.3s, box-shadow 0.3s; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
         }
-
         .month-btn:hover {
-            background-color: #0056b3;
+            transform: translateY(-3px); 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
         }
     </style>
 </head>

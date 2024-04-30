@@ -20,22 +20,22 @@
   <style>
 
 .list-group-item h5 {
-  color: #0f3c6c;  /* Bootstrap primary blue for date */
-  font-size: 16px;  /* Smaller font size for the date */
+  color: #0f3c6c;  
+  font-size: 16px;  
 }
 .list-group-item h4 {
-  font-size: 20px;  /* Smaller font size for the date */
+  font-size: 20px;  
 }
 
 .list-group-item h6 {
-  color: #6c757d;  /* Bootstrap secondary text color for time */
-  font-size: 14px;  /* Adjusted time size if needed */
+  color: #6c757d;  
+  font-size: 14px;  
 }
 
 
 
 .list-group-item p {
-  font-size: 16px;  /* Consistent font size for note text */
+  font-size: 16px; 
 }
 
     .navbar {
@@ -51,6 +51,21 @@
       justify-content: flex-end; 
     }
 
+    .navlink {
+      margin-top: 10px;
+    }
+
+    .navbar-nav .dropdown-menu .nav-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-nav .dropdown-menu .nav-item .nav-link {
+      color: #333 !important; 
+      outline: none;
+    }
+
     .navbar-brand {
       font-size: 24px;
       font-weight: bold;
@@ -64,7 +79,6 @@
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <!-- Updated href to link to the home page -->
     <a class="navbar-brand" href="/">Schedule Manager</a>
     <img src="https://tmetric.com/media/qfwptni2/work-schedules-header-banner.png" alt="Logo" style="height: 40px; margin-right: 10px;">
     <button
@@ -94,7 +108,7 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="colorDropdown">
             <a class="dropdown-item" href="#" onclick="changeBackgroundColor('white')">White</a>
-            <a class="dropdown-item" href="#" onclick="changeBackgroundColor('lightgray')">Light Gray</a>
+            <a class="dropdown-item" href="#" onclick="changeBackgroundColor('antiquewhite')">Antique White</a>
             <a class="dropdown-item" href="#" onclick="changeBackgroundColor('lightblue')">Light Blue</a>
           </div>
         </li>
@@ -159,10 +173,10 @@ function deleteNote(noteId) {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                alert(data.message); // Show success message from backend
-                location.reload(); // Reload the page to reflect the note deletion
+                alert(data.message); 
+                location.reload(); 
             } else {
-                alert(data.message); // Show error message from backend
+                alert(data.message); 
             }
         })
         .catch(error => {
@@ -187,7 +201,7 @@ function editNote(noteId, title, data) {
         .then(response => response.json())
         .then(data => {
             alert(data.message);
-            location.reload();  // Reload the page to see the updated note
+            location.reload();  
         })
         .catch(error => console.error('Error updating note:', error));
     }
@@ -201,7 +215,7 @@ function toggleNoteContent(noteElement) {
     } else {
         content.style.display = 'block';
         content.classList.add('note-expanded');
-        content.style.height = content.scrollHeight + 'px'; // This line may be unnecessary if you're not setting a specific height
+        content.style.height = content.scrollHeight + 'px'; 
     }
 }
 
