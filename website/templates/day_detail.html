@@ -10,27 +10,29 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
+        body {
+            padding-bottom: 200px;
+        }
         .time-grid {
             display: grid;
             grid-template-columns: 100px 1fr;
             gap: 10px;
             margin: 20px;
-            margin-bottom: 200px; /* Increased bottom margin */
 
         }
         .time-slot, .note-entry {
             padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 5px; /* Rounded borders */
-            background: #f9f9f9; /* Subtle background color */
+            border-radius: 5px; 
+            background: #f9f9f9; 
         }
         .note {
             border: 1px solid #ddd;
             padding: 10px;
             margin-bottom: 10px;
-            background-color: #ffffff; /* Brighter white background */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Soft shadow for depth */
-            transition: transform 0.3s, box-shadow 0.3s; /* Smooth transitions for hover effects */
+            background-color: #ffffff; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            transition: transform 0.3s, box-shadow 0.3s; 
         }
         .note:hover {
             transform: translateY(-2px);
@@ -40,7 +42,7 @@
             display: block;
             margin-bottom: 5px;
             cursor: pointer;
-            color: #333; /* Darker text for better readability */
+            color: #333; 
         }
         .note-content {
             display: none;
@@ -56,7 +58,7 @@
             padding-top: 10px;
         }
         h1 {
-            padding-top: 50px; /* Added padding above the title */
+            padding-top: 50px;
             text-align: center;
         }
         .current-hour {

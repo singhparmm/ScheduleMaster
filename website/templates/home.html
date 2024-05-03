@@ -1,57 +1,79 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="website/templates/home.css">
+{% endblock %}
 {% block content %}
-<h1 align="center">Upcoming Notes</h1>
-<div class="container mt-4">
-    {% if notes %}
-    <ul class="list-group">
-        {% for note in notes %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-                <h5>{{ note.date.strftime('%A, %B %d, %Y') }}</h5>
-                <h6>Time: {{ note.hour }}:00</h6>
-                <h4>{{ note.title }}</h4> <!-- Display the title of the note -->
-                <p>{{ note.data }}</p> <!-- Display the content of the note -->
-            </div>
-            <div>
-              <button type="button" onclick="editNote('{{ note.id }}', '{{ note.title }}', '{{ note.data }}')" class="btn btn-primary">Edit</button>
-              <button type="button" onclick="deleteNote({{ note.id }})" class="btn btn-danger">Delete</button>
-            </div>
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>No upcoming notes.</p>
-    {% endif %}
-</div>
-  
 
-  <form id="add-note-form">
-    <input type="text" id="title" name="title" class="form-control" placeholder="Enter title here..." required>
-    <textarea name="note" id="note" class="form-control" rows="4" cols="50" placeholder="Enter your note here..." required></textarea>
-    <br />
-    <div align="center">
-        <input type="date" name="date" id="note-date" required>
-        <br>
-        <label for="hour">Hour:</label>
-        <select name="hour" id="hour" required>
-            {% for hour in range(24) %}
-            <option value="{{ hour }}">{{ '%02d:00' % hour }}</option>
-            {% endfor %}
-        </select>
-        <br>
-        <label for="repeat-frequency">Repeat:</label>
-        <select name="repeat-frequency" id="repeat-frequency">
-            <option value="none">None</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-        </select>
-        <label for="repeat-duration">Repeat Until:</label>
-        <input type="date" name="repeat-duration" id="repeat-duration">
-        <button type="submit" class="btn btn-primary">Add Note</button>
+
+
+<div class="container-fluid">
+
+    <div class="holiday-toggle">
+        <button type="button" onclick="toggleUSHolidays(true)" class="btn btn-success">Enable US Holidays</button>
+        <button type="button" onclick="toggleUSHolidays(false)" class="btn btn-danger">Disable US Holidays</button>
     </div>
-</form>
 
+
+
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Add Note</h1>
+            <form id="add-note-form">
+                <input type="text" id="title" name="title" class="form-control" placeholder="Enter title here..." required>
+                <textarea name="note" id="note" class="form-control" rows="4" cols="50" placeholder="Enter your note here..." required></textarea>
+                <div class="align-center">
+                    <label for="date">Date:</label>
+                    <input type="date" name="date" id="note-date" required>
+                    <br>
+                    <label for="hour">Hour:</label>
+                    <select name="hour" id="hour" class="form-control" required>
+                        {% for hour in range(24) %}
+                        <option value="{{ hour }}">{{ '%02d:00' % hour }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                    <label for="repeat-frequency">Repeat:</label>
+                    <select name="repeat-frequency" id="repeat-frequency" class="form-control">
+                        <option value="none">None</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
+                    <br>
+                    <label for="repeat-duration">Repeat Until:</label>
+                    <input type="date" name="repeat-duration" id="repeat-duration" class="form-control">
+                    <br>
+                    <button type="submit" class="btn btn-primary">Add Note</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <h1>Upcoming Notes</h1>
+            <div class="container mt-4 overflow-auto" style="max-height: 500px;">
+                {% if notes %}
+                <ul class="list-group">
+                    {% for note in notes %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>{{ note.date.strftime('%A, %B %d, %Y') }}</h5>
+                            <h6>Time: {{ note.hour }}:00</h6>
+                            <h4>{{ note.title }}</h4> 
+                            <p>{{ note.data }}</p> 
+                        </div>
+                        <div>
+                            <button type="button" onclick="editNote('{{ note.id }}', '{{ note.title }}', '{{ note.data }}')" class="btn btn-primary">Edit</button>
+                            <button type="button" onclick="deleteNote({{ note.id }})" class="btn btn-danger">Delete</button>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>No upcoming notes.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
