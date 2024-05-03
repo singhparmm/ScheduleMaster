@@ -1,0 +1,63 @@
+.container-fluid {
+    padding: 20px;
+}
+
+.col-md-6 {
+    padding: 0 10px;
+}
+
+h1 {
+    align-items:center;
+}
+
+.form-control {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+#note {
+    resize: vertical;
+}
+
+form div.align-center {
+    text-align: center;
+}
+
+.overflow-auto {
+    overflow-y: auto;
+}
+
+.list-group-item {
+    margin-bottom: 10px;
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-group-item div {
+    margin-bottom: 5px;
+}
+
+.list-group-item button {
+    margin-right: 5px;
+}
+
+
+
+
+
+
+
+.holiday-btn-container {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    z-index: 1000; /* Make sure it's above other content */
+}
+
+.btn-info {
+    background-color: #17a2b8; /* Bootstrap info blue */
+}
+
+
+
