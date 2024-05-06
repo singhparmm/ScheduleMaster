@@ -7,39 +7,44 @@
 <head>
     <meta charset="UTF-8">
     <title>Yearly View</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
+        body {
+            padding-bottom: 300px;
+        }
         .year-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             padding: 20px;
+            padding-top: 50px;
             text-align: center;
         }
         .month-btn {
-            font-size: 20px; /* Slightly smaller font for balance */
+            font-size: 20px; 
             background-color: #007bff;
             color: white;
             text-decoration: none;
-            padding: 20px; /* Reduced padding for a more elegant look */
-            border-radius: 8px; /* Rounded corners for modern style */
+            padding: 20px; 
+            border-radius: 8px; 
             display: inline-block;
-            transition: transform 0.3s, box-shadow 0.3s; /* Smooth transition for hover effects */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+            transition: transform 0.3s, box-shadow 0.3s; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
         }
         .month-btn:hover {
-            transform: translateY(-3px); /* Slight lift on hover */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Enhanced shadow on hover */
+            transform: translateY(-3px); 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
         }
-        h1 {
+        .year-header {
             text-align: center;
             margin-top: 20px;
+            padding-top: 75px;
         }
     </style>
 </head>
 <body>
-    <h1>Yearly View: {{ year }}</h1>
+    <h1 class="year-header">Yearly View: {{ year }}</h1>
     <div class="year-grid">
         {% for month, offset in months_with_offsets %}
             <a class="month-btn" href="{{ url_for('views.monthly_view', offset=offset) }}">{{ month }}</a>

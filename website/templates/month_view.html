@@ -5,16 +5,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
+        body {
+            padding-bottom: 200px;
+        }
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             grid-gap: 10px;
             text-align: center;
-            margin-bottom: 200px; /* Increased bottom margin */
-
+            background-color: white;
+            border-radius: 10px;
         }
         .calendar-day {
             border: 1px solid #ddd;
@@ -37,16 +40,13 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
+            padding-top:30px;
         }
         .btn {
             padding: 10px 20px;
-            background-color: #007bff;
             color: white;
             border-radius: 5px;
             transition: background-color 0.2s;
-        }
-        .btn:hover {
-            background-color: #0056b3;
         }
         .note-count {
             display: block;
@@ -55,25 +55,33 @@
             color: #666;
         }
         .empty {
-            background-color: #eaeaea; /* Light gray for empty days */
+            background-color: #eaeaea; 
         }
 
         h1 {
-            padding-top: 50px; /* Added padding above the title */
+            padding-top: 50px; 
             text-align: center;
         }
         .current-day {
-            background-color: #c8e6c9; /* Green background for current day */
-            border-color: #43a047; /*   border for better visibility */
-}
+            background-color: #c8e6c9; 
+            border-color: #43a047; 
+        }
 
     </style>
 </head>
 <body>
     <h1>Monthly View: {{ current_month }} {{ current_year }}</h1>
     <div class="navigation-buttons">
-        <a href="{{ url_for('views.monthly_view', offset=prev_month_offset) }}" class="button primary large">Previous Month</a>
-        <a href="{{ url_for('views.monthly_view', offset=next_month_offset) }}" class="button primary large">Next Month</a>
+        <a href="{{ url_for('views.monthly_view', offset=prev_month_offset) }}" class="button primary large">
+            <i class="fa fa-chevron-left"></i> Previous Month
+        </a>
+        <div class="holiday-toggle">
+            <button type="button" onclick="toggleUSHolidays(true)" class="btn btn-success">Enable US Holidays</button>
+            <button type="button" onclick="toggleUSHolidays(false)" class="btn btn-danger">Disable US Holidays</button>
+        </div>    
+        <a href="{{ url_for('views.monthly_view', offset=next_month_offset) }}" class="button primary large">
+            Next Month  <i class="fa fa-chevron-right"></i>
+        </a>
     </div>
     <div class="calendar-grid">
         <div class="day-name">Sunday</div>

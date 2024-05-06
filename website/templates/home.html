@@ -8,14 +8,6 @@
 
 
 <div class="container-fluid">
-
-    <div class="holiday-toggle">
-        <button type="button" onclick="toggleUSHolidays(true)" class="btn btn-success">Enable US Holidays</button>
-        <button type="button" onclick="toggleUSHolidays(false)" class="btn btn-danger">Disable US Holidays</button>
-    </div>
-
-
-
     <div class="row">
         <div class="col-md-6">
             <h1>Add Note</h1>
@@ -74,6 +66,22 @@
                 {% endif %}
             </div>
         </div>
+
+        <div class="col-md-4">
+            <div class="note-filter-section smaller-filter">
+                <h3>Filter Upcoming Notes By Time Frame</h3>
+                <form action="{{ url_for('views.home') }}" method="GET">
+                    <select name="timeframe" onchange="this.form.submit()" class="form-control smaller-select">
+                        <option value="today" {% if current_timeframe == 'today' %}selected{% endif %} title="Today">Today</option>
+                        <option value="week" {% if current_timeframe == 'week' %}selected{% endif %} title="This Week">This Week</option>
+                        <option value="month" {% if current_timeframe == 'month' %}selected{% endif %} title="This Month">This Month</option>
+                        <option value="three_months" {% if current_timeframe == 'three_months' %}selected{% endif %} title="Next 3 Months">Next 3 Months</option>
+                        <option value="all" {% if current_timeframe == 'all' %}selected{% endif %} title="All Upcoming">All Upcoming</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}

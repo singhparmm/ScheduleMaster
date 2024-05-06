@@ -36,8 +36,8 @@ views = Blueprint('views', __name__)
 def home():
     if request.method == 'POST':
         note_content = request.form.get('note')
-        note_date = request.form.get('date')  # Assume date is passed as 'YYYY-MM-DD'
-        note_hour = request.form.get('hour')  # Assume hour is passed as an integer from 0 to 23
+        note_date = request.form.get('date')  
+        note_hour = request.form.get('hour')  
 
         if len(note_content) < 1:
             flash('Note is too short!', category='error')
@@ -50,12 +50,30 @@ def home():
                 flash('Note added!', category='success')
             except ValueError as e:
                 flash('Invalid date or time format', category='error')
-                print(e)  # For debugging
+                print(e)  
 
-    # Adjust query to include notes for today, even if past current time
+    timeframe = request.args.get('timeframe', 'all')
     now = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    notes = Note.query.filter(Note.user_id == current_user.id, Note.date >= now).order_by(Note.date.asc(), Note.hour.asc()).all()
-    return render_template("home.html", user=current_user, notes=notes)
+    base_query = Note.query.filter(Note.user_id == current_user.id)
+
+    if timeframe == 'today':
+        today_end = now.replace(hour=23, minute=59, second=59)
+        notes = base_query.filter(Note.date >= now, Note.date <= today_end).order_by(Note.date.asc(), Note.hour.asc()).all()
+    elif timeframe == 'week':
+        end_of_week = now + timedelta(days=6 - now.weekday())
+        notes = base_query.filter(Note.date >= now, Note.date <= end_of_week).order_by(Note.date.asc(), Note.hour.asc()).all()
+    elif timeframe == 'month':
+        end_of_month = now.replace(day=monthrange(now.year, now.month)[1])
+        notes = base_query.filter(Note.date >= now, Note.date <= end_of_month).order_by(Note.date.asc(), Note.hour.asc()).all()
+    elif timeframe == 'three_months':
+        start_of_current_month = now.replace(day=1)
+        end_of_third_month = (start_of_current_month + relativedelta(months=3)).replace(day=1) - timedelta(seconds=1)
+        notes = base_query.filter(Note.date >= now, Note.date <= end_of_third_month).order_by(Note.date.asc(), Note.hour.asc()).all()
+    else:  
+        notes = base_query.filter(Note.date >= now).order_by(Note.date.asc(), Note.hour.asc()).all()
+
+    return render_template("home.html", user=current_user, notes=notes, current_timeframe=timeframe)
+
 
 
 
