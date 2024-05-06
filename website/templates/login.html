@@ -2,8 +2,11 @@
   %}
   <style>
     body {
-      background: linear-gradient(to bottom, #333333, #222222); 
-      color: #fff; 
+      background-image: url("{{ url_for('static', filename='SchedulerBackground.png') }}");
+      background-size: cover;
+      background-repeat: no-repeat;
+      color: #fff;
+      font-family: Arial, sans-serif;
     }
     .container {
       height: 100vh; 

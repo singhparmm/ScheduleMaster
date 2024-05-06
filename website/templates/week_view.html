@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
@@ -84,8 +84,16 @@
 <body>
     <h1>Weekly View</h1>
     <div class="navigation-buttons">
-        <a href="{{ url_for('views.weekly_view', offset=prev_week_offset) }}" class="button primary large">Previous Week</a>
-        <a href="{{ url_for('views.weekly_view', offset=next_week_offset) }}" class="button primary large">Next Week</a>
+        <a href="{{ url_for('views.weekly_view', offset=prev_week_offset) }}" class="button primary large">
+            <i class="fa fa-chevron-left"></i> Previous Week
+        </a>
+        <div class="holiday-toggle">
+            <button type="button" onclick="toggleUSHolidays(true)" class="btn btn-success">Enable US Holidays</button>
+            <button type="button" onclick="toggleUSHolidays(false)" class="btn btn-danger">Disable US Holidays</button>
+        </div>    
+        <a href="{{ url_for('views.weekly_view', offset=next_week_offset) }}" class="button primary large">
+            Next Week  <i class="fa fa-chevron-right"></i> 
+        </a>
     </div>
     <div class="week-grid">
         <div style="visibility: hidden;">Time</div>

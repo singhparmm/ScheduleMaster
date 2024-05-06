@@ -4,24 +4,102 @@
     <link rel="stylesheet" type="text/css" href="website/templates/home.css">
 {% endblock %}
 {% block content %}
+
+<style>
+.container-fluid {
+    padding: 20px;
+}
+
+.col-md-6 {
+    padding: 0 10px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.form-control {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+#note {
+    resize: vertical;
+}
+
+form div.align-center {
+    text-align: center;
+}
+
+.overflow-auto {
+    overflow-y: auto;
+}
+
+.list-group-item {
+    display: flex;
+    flex-direction: row; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.note-details {
+    display: flex;
+    flex-direction: column; 
+    flex-grow: 1;
+    min-width: 0; 
+}
+
+.note-details h5, .note-details h6 {
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    margin: 0; 
+}
+
+.note-details h4, .note-details p {
+    margin: 5px 0;
+}
+
+.note-actions {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    margin-left: 20px; 
+}
+
+.note-actions button {
+    margin-bottom: 5px; 
+}
+
+.btn-info {
+    background-color: #17a2b8;
+}
+
+
+
+</style>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-6">
             <h1>Add Note</h1>
             <form id="add-note-form">
                 <input type="text" id="title" name="title" class="form-control" placeholder="Enter title here..." required>
-                <textarea name="note" id="note" class="form-control" rows="4" cols="50" placeholder="Enter your note here..." required></textarea>
+                <textarea name="note" id="note" class="form-control" rows="4" placeholder="Enter your note here..." required></textarea>
                 <div class="align-center">
                     <label for="date">Date:</label>
                     <input type="date" name="date" id="note-date" required>
-                    <br>
                     <label for="hour">Hour:</label>
                     <select name="hour" id="hour" class="form-control" required>
                         {% for hour in range(24) %}
                         <option value="{{ hour }}">{{ '%02d:00' % hour }}</option>
                         {% endfor %}
                     </select>
-                    <br>
                     <label for="repeat-frequency">Repeat:</label>
                     <select name="repeat-frequency" id="repeat-frequency" class="form-control">
                         <option value="none">None</option>
@@ -30,37 +108,47 @@
                         <option value="monthly">Monthly</option>
                         <option value="yearly">Yearly</option>
                     </select>
-                    <br>
                     <label for="repeat-duration">Repeat Until:</label>
                     <input type="date" name="repeat-duration" id="repeat-duration" class="form-control">
-                    <br>
                     <button type="submit" class="btn btn-primary">Add Note</button>
                 </div>
             </form>
         </div>
         <div class="col-md-6">
-            <h1>Upcoming Notes</h1>
-            <div class="container mt-4 overflow-auto" style="max-height: 500px;">
-                {% if notes %}
+            <h1>{{ user.first_name }}'s Upcoming Notes</h1>
+            <div>
+                <form action="{{ url_for('views.home') }}" method="GET" class="form-inline">
+                    <label for="timeframe" class="mr-sm-2">Filter Notes Until:</label>
+                    <select name="timeframe" onchange="this.form.submit()" class="form-control mb-2 mr-sm-2">
+                        <option value="today" {% if current_timeframe == 'today' %}selected{% endif %}>Today</option>
+                        <option value="week" {% if current_timeframe == 'week' %}selected{% endif %}>This Week</option>
+                        <option value="month" {% if current_timeframe == 'month' %}selected{% endif %}>This Month</option>
+                        <option value="three_months" {% if current_timeframe == 'three_months' %}selected{% endif %}>Next 3 Months</option>
+                        <option value="all" {% if current_timeframe == 'all' %}selected{% endif %}>All Upcoming</option>
+                    </select>
+                </form>
+            </div>
+            <div class="overflow-auto" style="max-height: 500px;">
                 <ul class="list-group">
+                    {% if notes %}
                     {% for note in notes %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
+                    <li class="list-group-item">
+                        <div class="note-content">
                             <h5>{{ note.date.strftime('%A, %B %d, %Y') }}</h5>
                             <h6>Time: {{ note.hour }}:00</h6>
-                            <h4>{{ note.title }}</h4> 
-                            <p>{{ note.data }}</p> 
+                            <h4>{{ note.title }}</h4>
+                            <p>{{ note.data }}</p>
                         </div>
-                        <div>
+                        <div class="note-actions">
                             <button type="button" onclick="editNote('{{ note.id }}', '{{ note.title }}', '{{ note.data }}')" class="btn btn-primary">Edit</button>
                             <button type="button" onclick="deleteNote({{ note.id }})" class="btn btn-danger">Delete</button>
                         </div>
                     </li>
                     {% endfor %}
+                    {% else %}
+                    <p>No upcoming notes.</p>
+                    {% endif %}
                 </ul>
-                {% else %}
-                <p>No upcoming notes.</p>
-                {% endif %}
             </div>
         </div>
     </div>

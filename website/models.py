@@ -5,7 +5,7 @@ from sqlalchemy.sql import func
 
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(255))  # Ensure this line is correctly added
+    title = db.Column(db.String(255))  
     data = db.Column(db.String(10000))
     date = db.Column(db.DateTime(timezone=True), default=func.now())
     hour = db.Column(db.Integer)
@@ -18,4 +18,5 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(150))
     first_name = db.Column(db.String(150))
     notes = db.relationship('Note')
+    show_holidays = db.Column(db.Boolean, default=True)
     
